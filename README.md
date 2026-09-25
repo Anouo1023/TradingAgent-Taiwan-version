@@ -1,188 +1,241 @@
-<p align="center">
-  <img src="assets/TauricResearch.png" style="width: 60%; height: auto;">
-</p>
+[README (1).md](https://github.com/user-attachments/files/32644602/README.1.md)
+# TradingAgent-Taiwan-version：支援台股的多代理人 LLM 交易分析框架
 
-<div align="center" style="line-height: 1;">
-  <a href="https://arxiv.org/abs/2412.20138" target="_blank"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2412.20138-B31B1B?logo=arxiv"/></a>
-  <a href="https://discord.com/invite/hk9PGKShPK" target="_blank"><img alt="Discord" src="https://img.shields.io/badge/Discord-TradingResearch-7289da?logo=discord&logoColor=white&color=7289da"/></a>
-  <a href="./assets/wechat.png" target="_blank"><img alt="WeChat" src="https://img.shields.io/badge/WeChat-TauricResearch-brightgreen?logo=wechat&logoColor=white"/></a>
-  <a href="https://x.com/TauricResearch" target="_blank"><img alt="X Follow" src="https://img.shields.io/badge/X-TauricResearch-white?logo=x&logoColor=white"/></a>
-  <br>
-  <a href="https://github.com/TauricResearch/" target="_blank"><img alt="Community" src="https://img.shields.io/badge/Join_GitHub_Community-TauricResearch-14C290?logo=discourse"/></a>
-</div>
+> 本專案 fork 並修改自 [TauricResearch/TradingAgents](https://github.com/TauricResearch/TradingAgents)（Apache-2.0 授權），新增**台股（上市 / 上櫃）支援**與**回測模式**。非原創框架，核心多代理人架構、研究方法與原始程式碼版權皆屬原作者所有，本 fork 僅新增台股在地化功能，詳見下方「這個 fork 改了什麼」。
 
-<div align="center">
-  <!-- Keep these links. Translations will automatically update with the README. -->
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=de">Deutsch</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=es">Español</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=fr">français</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=ja">日本語</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=ko">한국어</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=pt">Português</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=ru">Русский</a> | 
-  <a href="https://www.readme-i18n.com/TauricResearch/TradingAgents?lang=zh">中文</a>
-</div>
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+[![Based on](https://img.shields.io/badge/based%20on-TauricResearch%2FTradingAgents-black?logo=github)](https://github.com/TauricResearch/TradingAgents)
+
+> ⚠️ 下方「TradingAgents Framework」以後的內容為原專案的英文說明，保留供對照參考；圖片連結請改回指向原專案（`https://github.com/TauricResearch/TradingAgents/raw/main/assets/...`），除非你已經把 `assets/`、`tradingagents/`、`cli/` 等資料夾一併複製進本 repo，否則這些圖會是破圖。
 
 ---
 
-# TradingAgents: Multi-Agents LLM Financial Trading Framework
+## 這個 fork 改了什麼
 
-## News
-- [2026-03] **TradingAgents v0.2.3** released with multi-language support, GPT-5.4 family models, unified model catalog, backtesting date fidelity, and proxy support.
-- [2026-03] **TradingAgents v0.2.2** released with GPT-5.4/Gemini 3.1/Claude 4.6 model coverage, five-tier rating scale, OpenAI Responses API, Anthropic effort control, and cross-platform stability.
-- [2026-02] **TradingAgents v0.2.0** released with multi-provider LLM support (GPT-5.x, Gemini 3.x, Claude 4.x, Grok 4.x) and improved system architecture.
-- [2026-01] **Trading-R1** [Technical Report](https://arxiv.org/abs/2509.11420) released, with [Terminal](https://github.com/TauricResearch/Trading-R1) expected to land soon.
+原專案已經支援中國 A 股 / 港股等市場，這個版本延續同樣的架構模式，把台股（上市 `.TW`、上櫃 `.TWO`）也接進去，並補上回測功能，方便驗證分析報告的實際準確度。
 
-<div align="center">
-<a href="https://www.star-history.com/#TauricResearch/TradingAgents&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=TauricResearch/TradingAgents&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=TauricResearch/TradingAgents&type=Date" />
-   <img alt="TradingAgents Star History" src="https://api.star-history.com/svg?repos=TauricResearch/TradingAgents&type=Date" style="width: 80%; height: auto;" />
- </picture>
-</a>
-</div>
+### 1. 台股資料源判斷與接入
 
-> 🎉 **TradingAgents** officially released! We have received numerous inquiries about the work, and we would like to express our thanks for the enthusiasm in our community.
->
-> So we decided to fully open-source the framework. Looking forward to building impactful projects with you!
+台股在 Yahoo Finance 的代號格式是 `2330.TW`（上市）或 `6505.TWO`（上櫃）。修改的檔案與資料流：
 
-<div align="center">
-
-🚀 [TradingAgents](#tradingagents-framework) | ⚡ [Installation & CLI](#installation-and-cli) | 🎬 [Demo](https://www.youtube.com/watch?v=90gr5lwjIho) | 📦 [Package Usage](#tradingagents-package) | 🤝 [Contributing](#contributing) | 📄 [Citation](#citation)
-
-</div>
-
-## TradingAgents Framework
-
-TradingAgents is a multi-agent trading framework that mirrors the dynamics of real-world trading firms. By deploying specialized LLM-powered agents: from fundamental analysts, sentiment experts, and technical analysts, to trader, risk management team, the platform collaboratively evaluates market conditions and informs trading decisions. Moreover, these agents engage in dynamic discussions to pinpoint the optimal strategy.
-
-<p align="center">
-  <img src="assets/schema.png" style="width: 100%; height: auto;">
-</p>
-
-> TradingAgents framework is designed for research purposes. Trading performance may vary based on many factors, including the chosen backbone language models, model temperature, trading periods, the quality of data, and other non-deterministic factors. [It is not intended as financial, investment, or trading advice.](https://tauric.ai/disclaimer/)
-
-Our framework decomposes complex trading tasks into specialized roles. This ensures the system achieves a robust, scalable approach to market analysis and decision-making.
-
-### Analyst Team
-- Fundamentals Analyst: Evaluates company financials and performance metrics, identifying intrinsic values and potential red flags.
-- Sentiment Analyst: Analyzes social media and public sentiment using sentiment scoring algorithms to gauge short-term market mood.
-- News Analyst: Monitors global news and macroeconomic indicators, interpreting the impact of events on market conditions.
-- Technical Analyst: Utilizes technical indicators (like MACD and RSI) to detect trading patterns and forecast price movements.
-
-<p align="center">
-  <img src="assets/analyst.png" width="100%" style="display: inline-block; margin: 0 2%;">
-</p>
-
-### Researcher Team
-- Comprises both bullish and bearish researchers who critically assess the insights provided by the Analyst Team. Through structured debates, they balance potential gains against inherent risks.
-
-<p align="center">
-  <img src="assets/researcher.png" width="70%" style="display: inline-block; margin: 0 2%;">
-</p>
-
-### Trader Agent
-- Composes reports from the analysts and researchers to make informed trading decisions. It determines the timing and magnitude of trades based on comprehensive market insights.
-
-<p align="center">
-  <img src="assets/trader.png" width="70%" style="display: inline-block; margin: 0 2%;">
-</p>
-
-### Risk Management and Portfolio Manager
-- Continuously evaluates portfolio risk by assessing market volatility, liquidity, and other risk factors. The risk management team evaluates and adjusts trading strategies, providing assessment reports to the Portfolio Manager for final decision.
-- The Portfolio Manager approves/rejects the transaction proposal. If approved, the order will be sent to the simulated exchange and executed.
-
-<p align="center">
-  <img src="assets/risk.png" width="70%" style="display: inline-block; margin: 0 2%;">
-</p>
-
-## Installation and CLI
-
-### Installation
-
-Clone TradingAgents:
-```bash
-git clone https://github.com/TauricResearch/TradingAgents.git
-cd TradingAgents
+```
+interface.py           ← 統一入口，加入台股（.TW / .TWO）判斷邏輯
+      ↓
+y_finance.py            ← 股價、技術指標
+alpha_vantage_*.py      ← 基本面、新聞資料
+yfinance_news.py        ← 新聞資料
+      ↓
+agents/*.py             ← 各分析師 Prompt，加入中文語境與台股背景描述
 ```
 
-Create a virtual environment in any of your favorite environment managers:
+- `interface.py`：新增市場判斷，辨識代號結尾是否為 `.TW` / `.TWO`，自動導向對應的資料處理流程。
+- `y_finance.py`：沿用 Yahoo Finance 取得台股股價與技術指標。
+- `alpha_vantage_*.py`、`yfinance_news.py`：取得基本面與新聞資訊（部分資料源在台股的覆蓋率有限，屬已知限制）。
+- `agents/*.py`：各分析師（基本面 / 情緒 / 新聞 / 技術）Prompt 補上中文與台股市場的上下文，讓 LLM 輸出的分析更貼近台股語境。
+
+介面操作方式與原版**完全相同**，使用者不需要額外學習新的指令，只要輸入台股代號即可。
+
+### 2. 回測模式
+
+新增回測模式，可選擇回測的起訖日期，检验策略在歷史區間內的報酬表現，用於評估分析結果的實際準確度（而不只是看單次報告）。
+
+### Demo
+
+- 美股（原版）：`NVDA`、`AMZN`、`GOOG`
+- 台股（本 fork 新增）：`2330.TW`（台積電）、`2885.TW`（元大金）
+
+---
+
+## 專案簡介（原版）
+
+TradingAgents 是一個模擬真實交易公司運作方式的多代理人交易框架。透過部署多個專責的 LLM 代理人：
+
+- **分析團隊（Analyst Team）**：基本面分析師、情緒分析師、新聞分析師、技術分析師
+- **研究團隊（Researcher Team）**：多方 / 空方研究員互相辯論，權衡潛在收益與風險
+- **交易員代理（Trader Agent）**：整合前述報告，做出交易時機與部位大小的判斷
+- **風險管理團隊（Risk Management Team）**：持續評估市場波動性、流動性等風險因子，並將建議交給投資組合經理人做最終決策
+
+> ⚠️ 本框架僅供研究用途。實際交易表現會受所選 LLM、模型溫度、交易期間、資料品質等多重非決定性因素影響，**不構成任何財務、投資或交易建議**。
+
+---
+
+## 安裝
+
 ```bash
-conda create -n tradingagents python=3.13
-conda activate tradingagents
+git clone https://github.com/<your-username>/TradingAgents-TW.git
+cd TradingAgents-TW
 ```
 
-Install the package and its dependencies:
+建立虛擬環境：
+
+```bash
+conda create -n tradingagents-tw python=3.12
+conda activate tradingagents-tw
+```
+
+安裝套件與相依項目：
+
 ```bash
 pip install .
 ```
 
-### Docker
+### 所需 API Key
 
-Alternatively, run with Docker:
-```bash
-cp .env.example .env  # add your API keys
-docker compose run --rm tradingagents
-```
+| 用途 | 環境變數 | 說明 |
+|---|---|---|
+| 金融數據 | `FINNHUB_API_KEY` | Finnhub（免費額度即可使用） |
+| LLM（擇一或多個） | `OPENAI_API_KEY` | OpenAI，建議預先儲值約 USD $30 供測試 |
+| | `GOOGLE_API_KEY` | Google Gemini |
+| | `ANTHROPIC_API_KEY` | Anthropic Claude |
+| | `DEEPSEEK_API_KEY` | DeepSeek |
 
-For local models with Ollama:
-```bash
-docker compose --profile ollama run --rm tradingagents-ollama
-```
+也可以直接複製 `.env.example` 為 `.env` 並填入金鑰：
 
-### Required APIs
-
-TradingAgents supports multiple LLM providers. Set the API key for your chosen provider:
-
-```bash
-export OPENAI_API_KEY=...          # OpenAI (GPT)
-export GOOGLE_API_KEY=...          # Google (Gemini)
-export ANTHROPIC_API_KEY=...       # Anthropic (Claude)
-export XAI_API_KEY=...             # xAI (Grok)
-export OPENROUTER_API_KEY=...      # OpenRouter
-export ALPHA_VANTAGE_API_KEY=...   # Alpha Vantage
-```
-
-For local models, configure Ollama with `llm_provider: "ollama"` in your config.
-
-Alternatively, copy `.env.example` to `.env` and fill in your keys:
 ```bash
 cp .env.example .env
 ```
 
-### CLI Usage
+其餘 Provider（xAI、Qwen、GLM、MiniMax、OpenRouter、Ollama、Azure、Bedrock 等）設定方式與原專案相同，詳見原始 README 或 `tradingagents/default_config.py`。
 
-Launch the interactive CLI:
+---
+
+## 新手安裝教學（含 Windows / Mac 逐步操作）
+
+> 本教學參考並改寫自 YouTube 教學影片：[https://www.youtube.com/watch?v=0vcxNINMOBQ](https://www.youtube.com/watch?v=0vcxNINMOBQ)。原影片示範的是官方原版 TradingAgents 的安裝流程，這裡把 repo 網址換成本專案（台股版），並補充了台股代號範例；其餘操作步驟大致相同，適合完全沒用過 Git / Conda 的新手照著做。
+
+### 第一次使用
+
+1. 先下載安裝好以下工具：[Python](https://www.python.org/)、[Git](https://git-scm.com/)、[Anaconda](https://www.anaconda.com/)、[VS Code](https://code.visualstudio.com/)。
+2. 在桌面新增一個空資料夾，準備放置專案。
+3. 打開 **Anaconda Prompt**（終端機）。
+4. 切換到剛剛建立的資料夾：
+
+   ```bash
+   cd 你的資料夾路徑
+   ```
+
+5. Clone 本專案（台股版，取代原影片中的官方 repo 網址）：
+
+   ```bash
+   git clone https://github.com/Anouo1023/TradingAgent-Taiwan-version.git
+   cd TradingAgent-Taiwan-version
+   ```
+
+6. 建立並啟用虛擬環境：
+
+   ```bash
+   conda create -n tradingagents python=3.13
+   conda activate tradingagents
+   ```
+
+7. 安裝套件相依項目：
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+8. 申請必要的 API Key：
+   - 到 [Finnhub](https://finnhub.io/) 註冊，取得 `FINNHUB_API_KEY`（金融數據，免費額度即可）。
+   - 到 [OpenAI](https://platform.openai.com/) 註冊並儲值（建議先儲值約 USD $5～$30 供測試）取得 `OPENAI_API_KEY`；也可以改用 Google Gemini 或 Anthropic Claude 的 API Key。
+
+9. 設定環境變數（把下面的 `YOUR_FINNHUB_API_KEY`、`YOUR_OPENAI_API_KEY` 換成你剛剛申請到的金鑰）：
+
+   **macOS / Linux**
+   ```bash
+   export FINNHUB_API_KEY=YOUR_FINNHUB_API_KEY
+   export OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+   ```
+
+   **Windows（Anaconda Prompt）**
+   ```bash
+   set FINNHUB_API_KEY=YOUR_FINNHUB_API_KEY
+   set OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+   ```
+
+10. （Windows 常見的中文編碼問題）用 VS Code 打開專案，用左側搜尋功能找 `with open`，把檔案輸出相關的幾處 `open(...)` 補上 `encoding='utf-8'`，例如：
+
+    ```python
+    with open('output.txt', 'w', encoding='utf-8') as f:
+    ```
+
+    Windows 也建議額外設定：
+
+    ```bash
+    set PYTHONUTF8=1
+    ```
+
+11. 啟動程式：
+
+    ```bash
+    python -m cli.main
+    ```
+
+    看到互動式選單出現就代表安裝成功。
+
+12. 依照畫面提示輸入：
+    - 股票代碼（美股如 `NVDA`；**台股請輸入 `2330.TW`（上市）或 `6505.TWO`（上櫃）格式**）
+    - 分析日期
+    - 想使用的分析師與 LLM 模型
+
+13. 等待執行完成，即可看到完整的投資分析報告。
+
+### 第二次之後使用
+
+不需要重新 clone 或安裝套件，每次只要：
+
 ```bash
-tradingagents          # installed command
-python -m cli.main     # alternative: run directly from source
+cd 你的資料夾路徑/TradingAgent-Taiwan-version
+conda activate tradingagents
 ```
-You will see a screen where you can select your desired tickers, analysis date, LLM provider, research depth, and more.
 
-<p align="center">
-  <img src="assets/cli/cli_init.png" width="100%" style="display: inline-block; margin: 0 2%;">
-</p>
+接著重新設定 API Key（同步驟 9，終端機重開後環境變數會重置）：
 
-An interface will appear showing results as they load, letting you track the agent's progress as it runs.
+**macOS / Linux**
+```bash
+export FINNHUB_API_KEY=YOUR_FINNHUB_API_KEY
+export OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+```
 
-<p align="center">
-  <img src="assets/cli/cli_news.png" width="100%" style="display: inline-block; margin: 0 2%;">
-</p>
+**Windows**
+```bash
+set FINNHUB_API_KEY=YOUR_FINNHUB_API_KEY
+set OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+set PYTHONUTF8=1
+```
 
-<p align="center">
-  <img src="assets/cli/cli_transaction.png" width="100%" style="display: inline-block; margin: 0 2%;">
-</p>
+最後啟動：
 
-## TradingAgents Package
+```bash
+python -m cli.main
+```
 
-### Implementation Details
+> 💡 小提醒：把 API Key 直接寫在終端機指令中，重開機或關掉終端機後就會消失，需要重新輸入。若不想每次都手動設定，可以改用前面「安裝」章節提到的 `.env` 檔案方式（`cp .env.example .env` 後填入金鑰），程式會自動讀取，不需要每次手動 `export` / `set`。
 
-We built TradingAgents with LangGraph to ensure flexibility and modularity. The framework supports multiple LLM providers: OpenAI, Google, Anthropic, xAI, OpenRouter, and Ollama.
+---
 
-### Python Usage
+## 使用方式
 
-To use TradingAgents inside your code, you can import the `tradingagents` module and initialize a `TradingAgentsGraph()` object. The `.propagate()` function will return a decision. You can run `main.py`, here's also a quick example:
+### CLI
+
+```bash
+tradingagents          # 已安裝套件時可直接呼叫
+python -m cli.main     # 或直接從原始碼執行
+```
+
+啟動後選擇股票代號、分析日期、LLM Provider、研究深度等參數即可。
+
+**支援的代號格式**
+
+- 美股：`NVDA`、`AAPL`
+- 台股上市：`2330.TW`（台積電）
+- 台股上櫃：`6505.TWO`
+- 中國 A 股 / 港股等：沿用原專案支援
+
+### 回測模式
+
+在 CLI 或設定中選擇回測模式，指定回測的開始與結束日期，即可檢視策略在該區間的模擬報酬，用來檢驗分析報告的實際準確度。
+
+### Python 套件用法
 
 ```python
 from tradingagents.graph.trading_graph import TradingAgentsGraph
@@ -190,46 +243,41 @@ from tradingagents.default_config import DEFAULT_CONFIG
 
 ta = TradingAgentsGraph(debug=True, config=DEFAULT_CONFIG.copy())
 
-# forward propagate
-_, decision = ta.propagate("NVDA", "2026-01-15")
+# 以台股代號進行分析
+_, decision = ta.propagate("2330.TW", "2026-01-15")
 print(decision)
 ```
 
-You can also adjust the default configuration to set your own choice of LLMs, debate rounds, etc.
+其餘設定方式（切換 LLM Provider、調整辯論輪數等）與原專案一致，請參考 `tradingagents/default_config.py`。
 
-```python
-from tradingagents.graph.trading_graph import TradingAgentsGraph
-from tradingagents.default_config import DEFAULT_CONFIG
+---
 
-config = DEFAULT_CONFIG.copy()
-config["llm_provider"] = "openai"        # openai, google, anthropic, xai, openrouter, ollama
-config["deep_think_llm"] = "gpt-5.4"     # Model for complex reasoning
-config["quick_think_llm"] = "gpt-5.4-mini" # Model for quick tasks
-config["max_debate_rounds"] = 2
+## 已知限制
 
-ta = TradingAgentsGraph(debug=True, config=config)
-_, decision = ta.propagate("NVDA", "2026-01-15")
-print(decision)
-```
+- 部分基本面 / 新聞資料源（如 Alpha Vantage）對台股的覆蓋率不如美股完整，分析品質可能受限於資料可得性。
+- 本框架具有 LLM 驅動的非決定性特性，同一標的、同一日期的兩次執行結果可能不完全相同，屬預期行為而非錯誤，詳見原專案 README 的 Reproducibility 章節。
+- 回測結果不保證reproduce特定數字，僅供研究參考，不構成投資建議。
 
-See `tradingagents/default_config.py` for all configuration options.
+---
 
-## Contributing
+## 致謝與授權
 
-We welcome contributions from the community! Whether it's fixing a bug, improving documentation, or suggesting a new feature, your input helps make this project better. If you are interested in this line of research, please consider joining our open-source financial AI research community [Tauric Research](https://tauric.ai/).
+本專案基於 [TauricResearch/TradingAgents](https://github.com/TauricResearch/TradingAgents)（Apache-2.0 授權）修改而成，核心多代理人架構、研究方法與原始程式碼版權皆屬原作者所有。本 fork 僅新增台股資料接入與回測功能，並依照 Apache-2.0 授權條款釋出。
 
-## Citation
+若你也在研究中使用到本專案，請一併引用原始論文：
 
-Please reference our work if you find *TradingAgents* provides you with some help :)
-
-```
+```bibtex
 @misc{xiao2025tradingagentsmultiagentsllmfinancial,
-      title={TradingAgents: Multi-Agents LLM Financial Trading Framework}, 
+      title={TradingAgents: Multi-Agents LLM Financial Trading Framework},
       author={Yijia Xiao and Edward Sun and Di Luo and Wei Wang},
       year={2025},
       eprint={2412.20138},
       archivePrefix={arXiv},
       primaryClass={q-fin.TR},
-      url={https://arxiv.org/abs/2412.20138}, 
+      url={https://arxiv.org/abs/2412.20138},
 }
 ```
+
+- 原專案：https://github.com/TauricResearch/TradingAgents
+- 原始論文：https://arxiv.org/abs/2412.20138
+- License：[Apache-2.0](LICENSE)（沿用原專案授權條款）
